@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 import imageio
 from PIL import Image
+import pyglet
 import os
 
 '''
@@ -84,11 +85,27 @@ class Qutip:
         imageio.mimsave(dir + 'gif/' + 'bloch_anim.gif', images, duration=duration)
         im = Image.open(dir + 'gif/' + 'bloch_anim.gif')
 
+        animation = pyglet.image.load_animation(dir + 'gif/' + 'bloch_anim.gif')
+        sprite = pyglet.sprite.Sprite(animation)
+
+        w = sprite.width
+        h = sprite.height
+        window = pyglet.window.Window(width=w, height=h)
+        r, g, b, alpha = 0.5, 0.5, 0.8, 0.5
+        pyglet.gl.glClearColor(r, g, b, alpha)
+
+        @window.event
+        def on_draw():
+            window.clear()
+            sprite.draw()
+
+        pyglet.app.run()
+
 
 states = []
 thetas = linspace(0, pi, 21)
 for theta in thetas:
-    states.append((cos(theta/2)*basis(2, 0) + sin(theta/2)*basis(2, 1)).unit())
+    states.append((cos(theta/2) * basis(2, 0) + sin(theta/2) * basis(2, 1)).unit())
 
 
 # qiskit()
