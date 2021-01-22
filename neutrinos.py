@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 
 
 '''
-To Do       -   Fix Wave Function Printing
-            -   Add graphing for a range of energies for each neutrino cs reaction
+To Do       -   Add graphing for a range of energies for each neutrino cs reaction
             -   Add neutrino-muon lepton reactions
 '''
 
@@ -14,16 +13,16 @@ Variables and Constants
 '''
 # Variables
 delta_m_sq = 'Mass difference squared between two flavour states'
-delta_m_e_mu_sq = 7.59e-5      # eV**2
+delta_m_e_mu_sq = 7.53e-5      # eV**2
 delta_m_tau_mu_sq = 2.44e-3    # eV**2  # can be +ve or -ve
 delta_m_tau_e_sq = 2.44e-3     # eV**2  # can be +ve or -ve
 delta_m_mu_e_sq = delta_m_e_mu_sq      # eV**2
 delta_m_mu_tau_sq = delta_m_tau_mu_sq    # can be +ve or -ve
 delta_m_e_tau_sq = delta_m_tau_e_sq     # eV**2
 
-sin_sq_theta_e_tau = 0.1
-sin_sq_theta_e_mu = 0.861
-sin_sq_theta_mu_tau = 0.97      # actually > 0.92 but it varies on atmospheric values
+sin_sq_theta_e_tau = 0.093
+sin_sq_theta_e_mu = 0.846
+sin_sq_theta_mu_tau = 0.92      # actually > 0.92 but it varies on atmospheric values
 sin_sq_theta_mu_e = sin_sq_theta_e_mu
 sin_sq_theta_tau_e = sin_sq_theta_e_tau
 sin_sq_theta_tau_mu = sin_sq_theta_mu_tau
@@ -70,17 +69,17 @@ class Oscillations:
             p_e_mu_list.append(Oscillations.prob(self, flavours='e_mu', x=x))
             p_e_tau_list.append(Oscillations.prob(self, flavours='e_tau', x=x))
             p_e_e_list.append(
-                1 - (Oscillations.prob(self, flavours='e_mu', x=x) + Oscillations.prob(self, flavours='e_tau', x=x)))
+                (1 - (Oscillations.prob(self, flavours='e_mu', x=x)) * (1 - Oscillations.prob(self, flavours='e_tau', x=x))))
 
             p_mu_e_list.append(Oscillations.prob(self, flavours='mu_e', x=x))
             p_mu_tau_list.append(Oscillations.prob(self, flavours='mu_tau', x=x))
             p_mu_mu_list.append(
-                1 - (Oscillations.prob(self, flavours='mu_e', x=x) + Oscillations.prob(self, flavours='mu_tau', x=x)))
+                (1 - Oscillations.prob(self, flavours='mu_e', x=x)) * (1 - Oscillations.prob(self, flavours='mu_tau', x=x)))
 
             p_tau_e_list.append(Oscillations.prob(self, flavours='tau_e', x=x))
             p_tau_mu_list.append(Oscillations.prob(self, flavours='tau_mu', x=x))
             p_tau_tau_list.append(
-                1 - (Oscillations.prob(self, flavours='tau_e', x=x) + Oscillations.prob(self, flavours='tau_mu', x=x)))
+                (1 - (Oscillations.prob(self, flavours='tau_e', x=x)) * (1 - Oscillations.prob(self, flavours='tau_mu', x=x))))
 
         prob_e = [p_e_e_list, p_e_mu_list, p_e_tau_list]
         prob_mu = [p_mu_mu_list, p_mu_e_list, p_mu_tau_list]
@@ -106,7 +105,7 @@ class Oscillations:
                     axs[n].legend(['tau to tau', 'tau to e', 'tau to mu'], loc=1)
             n += 1
 
-    def prob(self, flavours, x,):
+    def prob(self, flavours, x):
         if flavours == 'e_mu':
             prob = sin_sq_theta_e_mu * np.square(np.sin(1.27 * delta_m_e_mu_sq * x / 4))
         elif flavours == 'e_tau':
@@ -276,9 +275,9 @@ class WaveFunctions:
 '''
 Running
 '''
-Oscillations(distance=1e5)    # Prints oscillation probabilities for flavours given the distance it travels
+Oscillations(distance=1e6)    # Prints oscillation probabilities for flavours given the distance it travels
 
-# WaveFunctions(accuracy=20) # Currently Broken. Doesnt plot correctly # Accuracy is the number of points within the range
+WaveFunctions(accuracy=20)      # Currently Broken. Doesnt plot correctly # Accuracy is the number of points within the range
 
 CrossSections(energy=20)    # Energy in GeV
 plt.show()
