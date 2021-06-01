@@ -371,8 +371,6 @@ for lepton in leptons.keys():
 
 all_cs = combine_cs(leptons['e'], leptons['u'])
 gate_reactions = gate_cs(all_cs)
-all_values = [values for values in gate_reactions.values()]
-print("Average Prob: ", np.average(all_values))
 plt.show()
 
 

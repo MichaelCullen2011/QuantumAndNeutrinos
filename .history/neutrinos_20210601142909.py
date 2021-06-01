@@ -148,37 +148,39 @@ Cross Sections
 
 class CrossSections:
     def __init__(self, energy, lepton):
-        E_v = energy
-        sigma_naught = 1.72e-45
+        if energy <= 11:
+            print("Energy Value Lower than 11 GeV")
+        else:
+            E_v = energy
+            sigma_naught = 1.72e-45
 
-        s_e = sigma_naught * np.pi / G_f**2
-        s_u = s_e * (m_u / m_e)
+            s_e = sigma_naught * np.pi / G_f**2
+            s_u = s_e * (m_u / m_e)
 
-        sigma_naught_e = (2 * m_e * G_f**2 * E_v) / np.pi
-        sigma_naught_u = (2 * m_u * G_f**2 * E_v) / np.pi
-
-        print("HERE ", sigma_naught_e, sigma_naught_u)
-        if lepton == 'e':
-            sigma_naught = sigma_naught_e
-            self.cs_without_ms = {'e_e': [], 'E_E': [], 'E_U': [], 'u_e': [], 'u_u': [], 'U_U': []}
-            self.cs_with_ms = {'e_e': [], 'E_E': [], 'E_U': [], 'u_e': [], 'u_u': [], 'U_U': []}
-        
-        elif lepton == 'u':
-            sigma_naught = sigma_naught_u
-            self.cs_without_ms = {'e_e': [], 'E_E': [], 'U_E': [], 'e_u': [], 'u_u': [], 'U_U': []}
-            self.cs_with_ms = {'e_e': [], 'E_E': [], 'U_E': [], 'e_u': [], 'u_u': [], 'U_U': []}
-        
-        for flavour in self.cs_without_ms.keys():
-            cs = CrossSections.neutrino_and_electron(self, flavour=flavour) * energy * sigma_naught
-            self.cs_without_ms[flavour].append(cs)
-            self.cs_with_ms[flavour].append(
-                cs * energy * sigma_naught * 
-                CrossSections.mass_suppression(
-                    self, flavour, energy=energy, reaction_lepton=lepton
+            sigma_naught_e = (G_f**2 * s_e) / np.pi
+            sigma_naught_u = (G_f**2 * s_u) / np.pi
+            
+            if lepton == 'e':
+                sigma_naught = sigma_naught_e
+                self.cs_without_ms = {'e_e': [], 'E_E': [], 'E_U': [], 'u_e': [], 'u_u': [], 'U_U': []}
+                self.cs_with_ms = {'e_e': [], 'E_E': [], 'E_U': [], 'u_e': [], 'u_u': [], 'U_U': []}
+            
+            elif lepton == 'u':
+                sigma_naught = sigma_naught_u
+                self.cs_without_ms = {'e_e': [], 'E_E': [], 'U_E': [], 'e_u': [], 'u_u': [], 'U_U': []}
+                self.cs_with_ms = {'e_e': [], 'E_E': [], 'U_E': [], 'e_u': [], 'u_u': [], 'U_U': []}
+            
+            for flavour in self.cs_without_ms.keys():
+                cs = CrossSections.neutrino_and_electron(self, flavour=flavour) * energy * sigma_naught
+                self.cs_without_ms[flavour].append(cs)
+                self.cs_with_ms[flavour].append(
+                    cs * energy * sigma_naught * 
+                    CrossSections.mass_suppression(
+                        self, flavour, energy=energy, reaction_lepton=lepton
+                    )
                 )
-            )
-        print("CS without mass suppression, \n", self.cs_without_ms)
-        print("CS with mass suppression, \n", self.cs_with_ms)
+            print("CS without mass suppression, \n", self.cs_without_ms)
+            print("CS with mass suppression, \n", self.cs_with_ms)
 
     def neutrino_and_electron(self, flavour):
         if flavour == 'e_e':
@@ -192,7 +194,7 @@ class CrossSections:
         elif flavour == 'u_u':
             cs = 1 / 4 - sin_sq_theta_w + 4 / 3 * np.square(sin_sq_theta_w)
         elif flavour == 'U_U':
-            cs = 1 / 12 - 1 / 3 * sin_sq_theta_w + 4 / 3 * np.square(sin_sq_theta_w)
+            cs = 1 / 12 - 1 / 3 * (sin_sq_theta_w + 4 / 3 * np.square(sin_sq_theta_w))
         return cs
 
     def mass_suppression(self, flavour, energy, reaction_lepton='e'):
@@ -267,7 +269,7 @@ def gate_cs(all_cs):
         gate_reactions[reaction_combined] = all_cs[first_reaction][0] * all_cs[second_reaction][0]
 
     for key, value in gate_reactions.items():
-        print(f"{key}: {value}")
+        print(f"{key}: {value} \n")
     return gate_reactions
 
 
@@ -367,12 +369,10 @@ leptons = {'e': [], 'u': []}
 for lepton in leptons.keys():
     # leptons[lepton] = CrossSections(energy=1000, lepton=lepton)    # Energy in GeV
     print(f'\n Cross Sections for Reactions with {lepton}:')
-    leptons[lepton] = CrossSections(energy=100, lepton=lepton)    # Energy in GeV
+    leptons[lepton] = CrossSections(energy=1000, lepton=lepton)    # Energy in GeV
 
 all_cs = combine_cs(leptons['e'], leptons['u'])
 gate_reactions = gate_cs(all_cs)
-all_values = [values for values in gate_reactions.values()]
-print("Average Prob: ", np.average(all_values))
 plt.show()
 
 

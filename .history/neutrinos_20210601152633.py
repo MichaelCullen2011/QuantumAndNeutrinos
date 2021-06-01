@@ -367,12 +367,10 @@ leptons = {'e': [], 'u': []}
 for lepton in leptons.keys():
     # leptons[lepton] = CrossSections(energy=1000, lepton=lepton)    # Energy in GeV
     print(f'\n Cross Sections for Reactions with {lepton}:')
-    leptons[lepton] = CrossSections(energy=100, lepton=lepton)    # Energy in GeV
+    leptons[lepton] = CrossSections(energy=1, lepton=lepton)    # Energy in GeV
 
 all_cs = combine_cs(leptons['e'], leptons['u'])
 gate_reactions = gate_cs(all_cs)
-all_values = [values for values in gate_reactions.values()]
-print("Average Prob: ", np.average(all_values))
 plt.show()
 
 
