@@ -298,7 +298,7 @@ class Gates:
     def calculate(self):
         for energy in self.energy_list:
             for lepton in self.leptons.keys():
-                # print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
+                print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
                 self.leptons[lepton] = CrossSections(energy=energy, lepton=lepton)    # Energy in GeV
 
             gate_reactions = Gates.gate_cs(Gates.combine_cs(self))
@@ -309,8 +309,6 @@ class Gates:
                     self.gate_energy_reactions[flavour].append(value[0])
             self.all_values[energy] = [values for values in gate_reactions.values()]
             print(f"Average Prob for {energy} GeV: ", np.average(self.all_values[energy]))
-            if energy == self.energy_list[-1]:
-                print(f"Neutrino-Lepton Gate Probabilities for {energy}GeV: \n {gate_reactions}")
             
         # plot
         Gates.plot_energies(self)
@@ -363,12 +361,13 @@ class Gates:
 
 
     def plot_energies(self):
+        print(self.gate_energy_reactions)
         for flavour, values in self.gate_energy_reactions.items():
             self.gate_energy_reactions[flavour] = [values, list(self.energy_list)]
 
         for flavour, values in self.gate_energy_reactions.items():
             plt.plot(values[1], values[0], '-')
-        plt.title(f"Neutrino-Lepton Gate Cross-Sections for Energies: {int(min(self.energy_list))}GeV - {int(max(self.energy_list))}GeV")
+        plt.title(f"Neutrino-Lepton Gate Cross-Sections for Energies: {int(min(energy_list))}GeV - {int(max(energy_list))}GeV")
         plt.legend(self.gate_energy_reactions.keys())
 
 
@@ -380,7 +379,7 @@ Running
 
 # WaveFunctions(accuracy=20)      # Currently Broken. Doesnt plot correctly # Accuracy is the number of points within the range
 
-Gates(energy_list=np.linspace(1, 100, 10)).calculate()         # calculates and plots gate probabilities at various energies for different interactions
+Gates(energy_list=np.linspace(1, 1000, 10)).calculate()         # calculates and plots gate probabilities at various energies for different interactions
 
 plt.show()
 

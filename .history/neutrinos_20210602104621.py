@@ -41,9 +41,27 @@ m_u = 105 * 1e-3       # GeV c-2
 sigma_naught = 1.72e-45         # m**2 / GeV
 
 
+mom_v = 0
+# mom_e = m_e + v_e
+# mom_u = m_u + v_u
+mom_e = np.sqrt((sigma_naught * np.pi) / G_f**2)
+mom_u = mom_e * (m_u / m_e)      # assume similar velocities
+
+kinematic_e = (mom_v + mom_e)**2
+kinematic_u = (mom_v + mom_u)**2
+
+kinematic_e = m_e**2 + 2*m_e*E_v
+kinematic_u = m_u**2 + 2*m_u*E_v
+
+sigma_naught_e = (G_f**2 * kinematic_e) / np.pi
+sigma_naught_u = (G_f**2 * kinematic_u) / np.pi
+
+
 '''
 Oscillation Probabilities   -   p_oscill = (np.sin(2 * theta))**2 * (np.sin((delta_m_sq * L) / (4 * E)))**2
 '''
+
+
 class Oscillations:
     def __init__(self, distance):
         p_e_mu_list = []
@@ -122,10 +140,11 @@ class Oscillations:
         return prob
 
 
-
 '''
 Cross Sections
 '''
+
+
 class CrossSections:
     def __init__(self, energy, lepton):
         E_v = energy
@@ -201,9 +220,14 @@ class CrossSections:
 
 
 
+
+
+
 '''
 Wave Functions (for plotting)
 '''
+
+
 class WaveFunctions:
     def __init__(self, accuracy):
         phi = np.linspace(0, np.pi, accuracy)
@@ -284,7 +308,6 @@ class WaveFunctions:
         return prob_f1, prob_f2
 
 
-
 '''
 Gates
 '''
@@ -296,12 +319,13 @@ class Gates:
         self.all_values = {}
 
     def calculate(self):
+        print(energy_list)
         for energy in self.energy_list:
             for lepton in self.leptons.keys():
-                # print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
-                self.leptons[lepton] = CrossSections(energy=energy, lepton=lepton)    # Energy in GeV
+                print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
+                leptons[lepton] = CrossSections(energy=energy, lepton=lepton)    # Energy in GeV
 
-            gate_reactions = Gates.gate_cs(Gates.combine_cs(self))
+            gate_reactions = gate_cs(combine_cs(leptons['e'], leptons['u']))
             if self.gate_energy_reactions is None:      # checking if first time running this script
                 self.gate_energy_reactions = gate_reactions
             else:
@@ -309,18 +333,15 @@ class Gates:
                     self.gate_energy_reactions[flavour].append(value[0])
             self.all_values[energy] = [values for values in gate_reactions.values()]
             print(f"Average Prob for {energy} GeV: ", np.average(self.all_values[energy]))
-            if energy == self.energy_list[-1]:
-                print(f"Neutrino-Lepton Gate Probabilities for {energy}GeV: \n {gate_reactions}")
             
-        # plot
-        Gates.plot_energies(self)
-        plt.show()
+            # plot
+            plot_energies(gate_energy_reactions)
+            plt.show()
 
 
-    def combine_cs(self):
+    def combine_cs(self, e_class, u_class):
         all_cs = {'e_e': [], 'e_u': [], 'u_u': [], 'u_e': [], 'E_E': [], 'E_U': [], 'U_U': [], 'U_E': []}
-        e_class = self.leptons['e']
-        u_class = self.leptons['u']
+        
         for all_reaction in all_cs.keys():
             for e_reaction, e_value in e_class.cs_without_ms.items():
                 if e_reaction == all_reaction:
@@ -332,11 +353,11 @@ class Gates:
         for all_reaction, all_values in all_cs.items():
             if len(all_values) > 1:
                 all_cs[all_reaction] = [(all_values[0] + all_values[1]) / 2]
+
         return all_cs
 
 
-    @staticmethod
-    def gate_cs(all_cs):
+    def gate_cs(self, all_cs):
         # creates our final dict with the probabilities for all gate interactions
         single_reactions = ['e_e', 'e_u', 'u_u', 'u_e']
         single_reactions_anti = ['E_E', 'E_U', 'U_U', 'U_E']
@@ -364,12 +385,13 @@ class Gates:
 
     def plot_energies(self):
         for flavour, values in self.gate_energy_reactions.items():
-            self.gate_energy_reactions[flavour] = [values, list(self.energy_list)]
+            self.gate_energy_reactions[flavour] = [values, list(energy_list)]
 
         for flavour, values in self.gate_energy_reactions.items():
             plt.plot(values[1], values[0], '-')
-        plt.title(f"Neutrino-Lepton Gate Cross-Sections for Energies: {int(min(self.energy_list))}GeV - {int(max(self.energy_list))}GeV")
+        plt.title(f"Neutrino-Lepton Gate Cross-Sections for Energies: {int(min(energy_list))}GeV - {int(max(energy_list))}GeV")
         plt.legend(self.gate_energy_reactions.keys())
+
 
 
 
@@ -380,8 +402,27 @@ Running
 
 # WaveFunctions(accuracy=20)      # Currently Broken. Doesnt plot correctly # Accuracy is the number of points within the range
 
-Gates(energy_list=np.linspace(1, 100, 10)).calculate()         # calculates and plots gate probabilities at various energies for different interactions
+energy_list = np.linspace(1, 1000, 10)       # in GeV
+# gate_energy_reactions = None
+# for energy in energy_list:
+#     leptons = {'e': [], 'u': []}
+#     for lepton in leptons.keys():
+#         print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
+#         leptons[lepton] = CrossSections(energy=energy, lepton=lepton)    # Energy in GeV
 
+#     all_cs = combine_cs(leptons['e'], leptons['u'])
+#     gate_reactions = gate_cs(all_cs)
+#     if gate_energy_reactions is None:
+#         gate_energy_reactions = gate_reactions
+#     else:
+#         for flavour, value in gate_reactions.items():
+#             gate_energy_reactions[flavour].append(value[0])
+#     all_values = [values for values in gate_reactions.values()]
+#     print(f"Average Prob for {energy} GeV: ", np.average(all_values))
+
+# gate_energy_reactions_plot_dict = plot_energies(gate_energy_reactions)
+neutrino_lepton_gates = Gates(energy_list)
+neutrino_lepton_gates.calculate
 plt.show()
 
 

@@ -298,7 +298,7 @@ class Gates:
     def calculate(self):
         for energy in self.energy_list:
             for lepton in self.leptons.keys():
-                # print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
+                print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
                 self.leptons[lepton] = CrossSections(energy=energy, lepton=lepton)    # Energy in GeV
 
             gate_reactions = Gates.gate_cs(Gates.combine_cs(self))
@@ -309,8 +309,6 @@ class Gates:
                     self.gate_energy_reactions[flavour].append(value[0])
             self.all_values[energy] = [values for values in gate_reactions.values()]
             print(f"Average Prob for {energy} GeV: ", np.average(self.all_values[energy]))
-            if energy == self.energy_list[-1]:
-                print(f"Neutrino-Lepton Gate Probabilities for {energy}GeV: \n {gate_reactions}")
             
         # plot
         Gates.plot_energies(self)
@@ -363,6 +361,7 @@ class Gates:
 
 
     def plot_energies(self):
+        print(self.gate_energy_reactions)
         for flavour, values in self.gate_energy_reactions.items():
             self.gate_energy_reactions[flavour] = [values, list(self.energy_list)]
 

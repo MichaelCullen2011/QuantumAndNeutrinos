@@ -298,7 +298,7 @@ class Gates:
     def calculate(self):
         for energy in self.energy_list:
             for lepton in self.leptons.keys():
-                # print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
+                print(f'\n Cross Sections for Reactions with {lepton} at {energy} GeV:')
                 self.leptons[lepton] = CrossSections(energy=energy, lepton=lepton)    # Energy in GeV
 
             gate_reactions = Gates.gate_cs(Gates.combine_cs(self))
