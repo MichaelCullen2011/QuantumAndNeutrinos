@@ -27,6 +27,7 @@ nest-asyncio==1.5.1
 networkx==2.5
 ntlm-auth==1.5.0
 numpy==1.20.1
+packaging==20.9
 pandas==1.2.2
 Pillow==8.1.0
 ply==3.11
@@ -47,6 +48,7 @@ qiskit-ibmq-provider==0.11.1
 qiskit-ignis==0.5.2
 qiskit-terra==0.16.4
 Quandl==3.6.0
+qutip==4.6.2
 requests==2.25.1
 requests-ntlm==1.1.0
 retworkx==0.7.2

@@ -105,9 +105,9 @@ class Qutip:
 
 
 states = []
-thetas = np.linspace(0, np.pi, 21)
+thetas = np.linspace(0, pi, 21)
 for theta in thetas:
-    states.append((np.cos(theta/2) * basis(2, 0) + np.sin(theta/2) * basis(2, 1)).unit())
+    states.append((np.cos(theta/2) * basis(2, 0) + sin(theta/2) * basis(2, 1)).unit())
 
 
 # qiskit()
