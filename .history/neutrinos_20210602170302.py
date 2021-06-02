@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 '''
 To Do           - tau interactions
-                - make all classes share some common variables (energy, distance, etc.)
 '''
 
 
@@ -17,14 +16,14 @@ delta_m_sq = {'eu': 7.53e-5, 'tu': 2.44e-3, 'te': 2.44e-3, 'ue': 7.53e-5, 'ut': 
 sin_sq_theta = {'eu': 0.846, 'tu': 0.92, 'te': 0.093, 'ue': 0.846, 'ut': 0.92, 'et': 0.093}
 # Other Physics Constants
 G_f = 1.1663787e-5              # : GeV**-2 : Fermi Coupling Constant
-sin_sq_theta_w = 0.22290        # :  : Sin Squared of Weinberg Angle
+sin_sq_theta_w = 0.22290        # : Radians : Weinberg Angle
 m_e = 0.511 * 1e-3              # : GeV c**-2 : Electron Mass
 m_u = 105 * 1e-3                # : GeV c**-2 : Muon Mass
 sigma_naught = 1.72e-45         # : m**2 / GeV : IBD Experimental Cross-Section
 
 
 '''
-Oscillation Probabilities
+Oscillation Probabilities   -   p_oscill = (np.sin(2 * theta))**2 * (np.sin((delta_m_sq * L) / (4 * E)))**2
 '''
 class Oscillations:
     def __init__(self, distance=1e6, energy=10):
@@ -186,7 +185,7 @@ class CrossSections:
 
 
 '''
-Wave Functions
+Wave Functions (for plotting)
 '''
 class WaveFunctions:
     def __init__(self, accuracy):
@@ -272,7 +271,7 @@ class WaveFunctions:
 
 
 '''
-Quantum Gate Interactions
+Gates
 '''
 class Gates:
     def __init__(self, energy_list):
@@ -370,7 +369,7 @@ WaveFunctions(accuracy=20).calculate()                      # Accuracy is the nu
 
 # Calculates and plots gate probabilities at various energies for different interactions
 Gates(energy_list=np.linspace(1, 100, 10)).calculate()      # energy_list is a list of GeV energies to calculate for
-
+plt.show()
 
 
 

@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 '''
 To Do           - tau interactions
-                - make all classes share some common variables (energy, distance, etc.)
 '''
 
 
@@ -24,7 +23,7 @@ sigma_naught = 1.72e-45         # : m**2 / GeV : IBD Experimental Cross-Section
 
 
 '''
-Oscillation Probabilities
+Oscillation Probabilities   -   p_oscill = (np.sin(2 * theta))**2 * (np.sin((delta_m_sq * L) / (4 * E)))**2
 '''
 class Oscillations:
     def __init__(self, distance=1e6, energy=10):
@@ -370,7 +369,7 @@ WaveFunctions(accuracy=20).calculate()                      # Accuracy is the nu
 
 # Calculates and plots gate probabilities at various energies for different interactions
 Gates(energy_list=np.linspace(1, 100, 10)).calculate()      # energy_list is a list of GeV energies to calculate for
-
+plt.show()
 
 
 

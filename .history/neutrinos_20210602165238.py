@@ -4,27 +4,29 @@ import matplotlib.pyplot as plt
 
 '''
 To Do           - tau interactions
-                - make all classes share some common variables (energy, distance, etc.)
+                - clean up constant variables into dicts or lists
 '''
 
 
 '''
-Constants
+Variables and Constants
 '''
+# # Constants
 # Mass difference squared between two flavour states
-delta_m_sq = {'eu': 7.53e-5, 'tu': 2.44e-3, 'te': 2.44e-3, 'ue': 7.53e-5, 'ut': 2.44e-3, 'et': 2.44e-3}     # eV**-2
+delta_m_sq = {'eu': 7.53e-5, 'tu': 2.44e-3, 'te': 2.44e-3, 'ue': 7.53e-5, 'ut': 2.44e-3, 'et': 2.44e-3}
 # Angle between flavour states
-sin_sq_theta = {'eu': 0.846, 'tu': 0.92, 'te': 0.093, 'ue': 0.846, 'ut': 0.92, 'et': 0.093}
-# Other Physics Constants
-G_f = 1.1663787e-5              # : GeV**-2 : Fermi Coupling Constant
-sin_sq_theta_w = 0.22290        # :  : Sin Squared of Weinberg Angle
-m_e = 0.511 * 1e-3              # : GeV c**-2 : Electron Mass
-m_u = 105 * 1e-3                # : GeV c**-2 : Muon Mass
-sigma_naught = 1.72e-45         # : m**2 / GeV : IBD Experimental Cross-Section
+sin_q_theta = {'eu': 0.846, 'tu': 0.92, 'te': 0.093, 'ue': 0.846, 'ut': 0.92, 'et': 0.093}
+
+G_f = 1.1663787e-5         # GeV-2
+sin_sq_theta_w = 0.22290        # Weinberg angle
+m_e = 0.511 * 1e-3     # GeV c-2
+m_u = 105 * 1e-3       # GeV c-2
+sigma_naught = 1.72e-45         # m**2 / GeV
+
 
 
 '''
-Oscillation Probabilities
+Oscillation Probabilities   -   p_oscill = (np.sin(2 * theta))**2 * (np.sin((delta_m_sq * L) / (4 * E)))**2
 '''
 class Oscillations:
     def __init__(self, distance=1e6, energy=10):
@@ -91,18 +93,18 @@ class Oscillations:
 
 
     def prob(self, flavours, x):
-        # if flavours == 'eu':
-        prob = sin_sq_theta[flavours] * np.square(np.sin(1.27 * delta_m_sq[flavours] * x / 4))
-        # elif flavours == 'et':
-        #     prob = sin_sq_theta_e_tau * np.square(np.sin(1.27 * delta_m_e_tau_sq * x / 4))
-        # elif flavours == 'ue':
-        #     prob = sin_sq_theta_e_mu * np.square(np.sin(1.27 * delta_m_mu_e_sq * x / 4))
-        # elif flavours == 'ut':
-        #     prob = sin_sq_theta_mu_tau * np.square(np.sin(1.27 * delta_m_mu_tau_sq * x / 4))
-        # elif flavours == 'te':
-        #     prob = sin_sq_theta_tau_e * np.square(np.sin(1.27 * delta_m_tau_e_sq * x / 4))
-        # elif flavours == 'tu':
-        #     prob = sin_sq_theta_tau_mu * np.square(np.sin(1.27 * delta_m_tau_mu_sq * x / 4))
+        if flavours == 'eu':
+            prob = sin_sq_theta_e_mu * np.square(np.sin(1.27 * delta_m_e_mu_sq * x / 4))
+        elif flavours == 'et':
+            prob = sin_sq_theta_e_tau * np.square(np.sin(1.27 * delta_m_e_tau_sq * x / 4))
+        elif flavours == 'ue':
+            prob = sin_sq_theta_e_mu * np.square(np.sin(1.27 * delta_m_mu_e_sq * x / 4))
+        elif flavours == 'ut':
+            prob = sin_sq_theta_mu_tau * np.square(np.sin(1.27 * delta_m_mu_tau_sq * x / 4))
+        elif flavours == 'te':
+            prob = sin_sq_theta_tau_e * np.square(np.sin(1.27 * delta_m_tau_e_sq * x / 4))
+        elif flavours == 'tu':
+            prob = sin_sq_theta_tau_mu * np.square(np.sin(1.27 * delta_m_tau_mu_sq * x / 4))
         return prob
 
 
@@ -186,26 +188,20 @@ class CrossSections:
 
 
 '''
-Wave Functions
+Wave Functions (for plotting)
 '''
 class WaveFunctions:
     def __init__(self, accuracy):
         self.accuracy = accuracy
-
         self.phi_range = np.linspace(0, np.pi, accuracy)
         self.theta = np.linspace(0, 2 * np.pi, 20)
-        self.order_tau_d_same = 1
-        self.order_tau_d_change = 1 / 3
-
         self.flavour_list = ['ee', 'eu', 'et', 'uu', 'ue', 'ut', 'tt', 'te', 'tu']
         self.prob_at_detector, self.detector_1, self.detector_2 = {flavour: [] for flavour in self.flavour_list}, {flavour: [] for flavour in self.flavour_list}, {flavour: [] for flavour in self.flavour_list}
-        
 
-
-    def calculate(self):
-        for flavour_change in self.flavour_list:
-            for phi_value in self.phi_range:
+        for flavour_change in flavour_list:
+            for phi_value in self.phi:
                 self.prob_at_detector[flavour_change].append(WaveFunctions.prob(self, flavour=flavour_change, phi=phi_value))
+
             for tuple in self.prob_at_detector[flavour_change]:
                 self.detector_1[flavour_change].append(tuple[0])
                 self.detector_2[flavour_change].append(tuple[0])
@@ -229,50 +225,52 @@ class WaveFunctions:
 
         for prob_list in self.detector_1.values():
             #print(prob_list)
-            ax1.plot(self.phi_range, prob_list, '--', linewidth=1)
+            ax1.plot(self.phi, prob_list, '--', linewidth=1)
 
         for prob_list in self.detector_2.values():
             #print(prob_list)
-            ax2.plot(self.phi_range, prob_list, '--', linewidth=1)
+            ax2.plot(self.phi, prob_list, '--', linewidth=1)
 
         ax1.legend(self.flavour_list, loc=1)
         ax2.legend(self.flavour_list, loc=1)
 
 
     def prob(self, flavour, phi):
+        order_tau_d_same = 1
+        order_tau_d_change = 1 / 3
         if flavour == 'ee':
             prob_f1 = 1
             prob_f2 = 0
         elif flavour == 'eu':
-            prob_f1 = 1 - (np.sqrt(sin_sq_theta['et']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
-            prob_f2 = (np.sqrt(sin_sq_theta['et']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
+            prob_f1 = 1 - (np.sqrt(sin_q_theta['et']) / 2) * (1 - order_tau_d_change * np.cos(phi))
+            prob_f2 = (np.sqrt(sin_q_theta['et']) / 2) * (1 - order_tau_d_change * np.cos(phi))
         elif flavour == 'et':
-            prob_f1 = 1 - (np.sqrt(sin_sq_theta['et']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
-            prob_f2 = (np.sqrt(sin_sq_theta['et']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
+            prob_f1 = 1 - (np.sqrt(sin_q_theta['et']) / 2) * (1 - order_tau_d_change * np.cos(phi))
+            prob_f2 = (np.sqrt(sin_q_theta['et']) / 2) * (1 - order_tau_d_change * np.cos(phi))
         if flavour == 'uu':
             prob_f1 = 1
             prob_f2 = 0
         elif flavour == 'ue':
-            prob_f1 = 1 - (np.sqrt(sin_sq_theta['eu']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
-            prob_f2 = (np.sqrt(sin_sq_theta['eu']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
+            prob_f1 = 1 - (np.sqrt(sin_q_theta['eu']) / 2) * (1 - order_tau_d_change * np.cos(phi))
+            prob_f2 = (np.sqrt(sin_q_theta['eu']) / 2) * (1 - order_tau_d_change * np.cos(phi))
         elif flavour == 'ut':
-            prob_f1 = 1 - (np.sqrt(sin_sq_theta['ut']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
-            prob_f2 = (np.sqrt(sin_sq_theta['ut']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
+            prob_f1 = 1 - (np.sqrt(sin_q_theta['ut']) / 2) * (1 - order_tau_d_change * np.cos(phi))
+            prob_f2 = (np.sqrt(sin_q_theta['ut']) / 2) * (1 - order_tau_d_change * np.cos(phi))
         if flavour == 'tt':
             prob_f1 = 1
             prob_f2 = 0
         elif flavour == 'te':
-            prob_f1 = 1 - (np.sqrt(sin_sq_theta['te']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
-            prob_f2 = (np.sqrt(sin_sq_theta['te']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
+            prob_f1 = 1 - (np.sqrt(sin_q_theta['te']) / 2) * (1 - order_tau_d_change * np.cos(phi))
+            prob_f2 = (np.sqrt(sin_q_theta['te']) / 2) * (1 - order_tau_d_change * np.cos(phi))
         elif flavour == 'tu':
-            prob_f1 = 1 - (np.sqrt(sin_sq_theta['tu']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
-            prob_f2 = (np.sqrt(sin_sq_theta['tu']) / 2) * (1 - self.order_tau_d_change * np.cos(phi))
+            prob_f1 = 1 - (np.sqrt(sin_q_theta['tu']) / 2) * (1 - order_tau_d_change * np.cos(phi))
+            prob_f2 = (np.sqrt(sin_q_theta['tu']) / 2) * (1 - order_tau_d_change * np.cos(phi))
         return prob_f1, prob_f2
 
 
 
 '''
-Quantum Gate Interactions
+Gates
 '''
 class Gates:
     def __init__(self, energy_list):
@@ -362,15 +360,13 @@ class Gates:
 '''     
 Running
 '''
-# Prints oscillation probabilities for flavours given the distance it travels
-Oscillations(distance=1e6, energy=10).calculate()           # distance in Km and energy in GeV
+Oscillations(distance=1e6, energy=10).calculate()    # Prints oscillation probabilities for flavours given the distance it travels
 
-# Calculates wavefunctions at two detectors for numerous oscillation flavour changes
-WaveFunctions(accuracy=20).calculate()                      # Accuracy is the number of points within the range
+# WaveFunctions(accuracy=20)      # Currently Broken!!! Doesnt plot correctly # Accuracy is the number of points within the range
 
-# Calculates and plots gate probabilities at various energies for different interactions
-Gates(energy_list=np.linspace(1, 100, 10)).calculate()      # energy_list is a list of GeV energies to calculate for
+Gates(energy_list=np.linspace(1, 100, 10)).calculate()         # calculates and plots gate probabilities at various energies for different interactions
 
+plt.show()
 
 
 

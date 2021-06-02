@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 '''
 To Do           - tau interactions
-                - make all classes share some common variables (energy, distance, etc.)
 '''
 
 

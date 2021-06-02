@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 '''
 To Do           - tau interactions
-                - make all classes share some common variables (energy, distance, etc.)
 '''
 
 
@@ -370,7 +369,7 @@ WaveFunctions(accuracy=20).calculate()                      # Accuracy is the nu
 
 # Calculates and plots gate probabilities at various energies for different interactions
 Gates(energy_list=np.linspace(1, 100, 10)).calculate()      # energy_list is a list of GeV energies to calculate for
-
+plt.show()
 
 
 
